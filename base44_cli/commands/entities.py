@@ -315,3 +315,62 @@ def import_records(
         print_output(result, "json")
     except Exception as e:
         print_error(str(e))
+
+
+@app.command("export-all")
+def export_all_entities(
+    output_dir: str = typer.Option("data", "--output-dir", "-o", help="Output directory"),
+    service_role: bool = typer.Option(False, "--service-role", help="Use service role"),
+    limit: Optional[int] = typer.Option(None, "--limit", "-l", help="Maximum records per entity"),
+) -> None:
+    """Export all entities in the app to JSON files."""
+    try:
+        config = ConfigManager().load_config()
+        client = Base44Client(config)
+
+        # Get app info to retrieve all entities
+        console.print("[blue]Fetching app information...[/blue]")
+        app_data = client.app_get_info()
+        entities = app_data.get("entities", {})
+
+        if not entities:
+            print_warning("No entities found in this app")
+            return
+
+        # Create output directory
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        entity_names = list(entities.keys())
+        console.print(f"[cyan]Found {len(entity_names)} entities to export[/cyan]")
+
+        # Export each entity
+        exported_entities = []
+        for entity_name in entity_names:
+            try:
+                console.print(f"[blue]Exporting {entity_name}...[/blue]")
+
+                # Fetch all records for this entity
+                records = client.entity_list(entity_name, limit=limit, use_service_role=service_role)
+
+                # Save to JSON file
+                entity_file = output_path / f"{entity_name}.json"
+                save_json_file(records, str(entity_file))
+
+                exported_entities.append(entity_name)
+                console.print(f"[green]✓[/green] Exported {len(records)} {entity_name} records to {entity_file}")
+
+            except Exception as e:
+                console.print(f"[red]✗[/red] Failed to export {entity_name}: {e}")
+                continue
+
+        # Save .entities file with list of exported entities
+        entities_file = output_path / ".entities"
+        with open(entities_file, "w") as f:
+            f.write("\n".join(exported_entities))
+
+        print_success(f"Exported {len(exported_entities)} entities to {output_dir}/")
+        console.print(f"[dim]Entity list saved to {entities_file}[/dim]")
+
+    except Exception as e:
+        print_error(str(e))

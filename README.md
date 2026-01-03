@@ -291,6 +291,10 @@ base44 entity delete-many Task --query '{"status": "archived"}' --yes
 base44 entity export Task --output tasks.csv --format csv
 base44 entity import Task --file tasks.csv --format csv
 
+# Export all entities in the app
+base44 entity export-all --output-dir data
+base44 entity export-all --output-dir backups --limit 100
+
 # Service role operations
 base44 entity list User --service-role
 ```
@@ -490,7 +494,17 @@ base44 entity export Product --output products.csv --format csv
 # Modify in Excel/Google Sheets, then import
 base44 entity import Product --file products-updated.csv --format csv
 
-# Backup all data
+# Export all entities in the app to JSON files
+base44 entity export-all --output-dir data
+# This creates:
+#   data/Entity1.json
+#   data/Entity2.json
+#   data/.entities (list of exported entities)
+
+# Backup all data with limit
+base44 entity export-all --output-dir backup --limit 1000
+
+# Export single entity
 base44 entity export Task --output backup/tasks.json
 base44 entity export User --output backup/users.json --service-role
 ```
