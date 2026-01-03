@@ -4,7 +4,7 @@ import typer
 from rich.console import Console
 
 from . import __version__
-from .commands import agents, auth, config_cmd, connectors, entities, functions, integrations, logs
+from .commands import agents, app as app_cmd, auth, config_cmd, connectors, entities, functions, integrations, logs
 
 app = typer.Typer(
     name="base44",
@@ -15,6 +15,7 @@ console = Console()
 
 # Add command groups
 app.add_typer(auth.app, name="auth")
+app.add_typer(app_cmd.app, name="app")
 app.add_typer(entities.app, name="entity")
 app.add_typer(functions.app, name="function")
 app.add_typer(integrations.app, name="integration")

@@ -219,6 +219,30 @@ base44 logs stats
 base44 connector get-token GoogleDrive
 ```
 
+### App Commands
+
+```bash
+# Get app information
+base44 app info
+base44 app info --app-id <app-id>
+
+# Show detailed app information
+base44 app details
+
+# List all entities in the app
+base44 app entities
+base44 app entities --format json
+
+# List all pages in the app
+base44 app pages
+
+# Switch to a different app by domain
+base44 app switch family-flow-55bc26d2.base44.app
+base44 app switch my-app.base44.app --no-save
+```
+
+**Note**: The `app switch` command allows you to switch between different Base44 apps using the same API key. It looks up the app ID from the domain name and saves it to your current profile.
+
 ### Configuration Commands
 
 ```bash
@@ -379,6 +403,28 @@ base44 entity import Product --file products-updated.csv --format csv
 # Backup all data
 base44 entity export Task --output backup/tasks.json
 base44 entity export User --output backup/users.json --service-role
+```
+
+### Managing Multiple Apps
+
+```bash
+# View current app details
+base44 app details
+
+# Switch to a different app using its domain
+base44 app switch my-other-app.base44.app
+
+# List entities in the new app
+base44 app entities
+
+# Work with entities from the new app
+base44 entity list User --limit 5
+
+# Switch back to original app
+base44 app switch my-original-app.base44.app
+
+# Query specific app without switching
+base44 app entities --app-id 68630c0fcb589f2fa5c22132
 ```
 
 ## Troubleshooting

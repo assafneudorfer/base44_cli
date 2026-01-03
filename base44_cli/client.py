@@ -380,6 +380,24 @@ class Base44Client:
         response.raise_for_status()
         return response.json()
 
+    # App info endpoints
+    def app_get_info(self, app_id: Optional[str] = None) -> dict[str, Any]:
+        """Get app information by app_id."""
+        target_app_id = app_id or self.app_id
+        response = self.client.get(f"/api/apps/public/prod/by-id/{target_app_id}")
+        response.raise_for_status()
+        return response.json()
+
+    def app_get_id_from_domain(self, domain: str) -> str:
+        """Get app_id from domain name."""
+        # Use the old base URL for this endpoint
+        response = httpx.get(
+            f"https://base44.app/api/apps/public/prod/domain/{domain}",
+            timeout=float(self.config.timeout),
+        )
+        response.raise_for_status()
+        return response.json()
+
     def __del__(self) -> None:
         """Close HTTP client on cleanup."""
         if hasattr(self, "client"):
