@@ -275,12 +275,21 @@ def export_records(
         print_error(str(e))
 
 
+def _clean_record_for_import(record: dict) -> dict:
+    """Remove system fields that shouldn't be imported."""
+    # System fields that are auto-generated
+    system_fields = {"id", "_id", "created_date", "updated_date", "created_at", "updated_at",
+                     "created_by_id", "created_by", "is_sample"}
+    return {k: v for k, v in record.items() if k not in system_fields}
+
+
 @app.command("import")
 def import_records(
     entity_name: str = typer.Argument(..., help="Entity name"),
     file: str = typer.Option(..., "--file", help="Input file path"),
     import_format: str = typer.Option("json", "--format", "-f", help="Import format (json, csv)"),
     service_role: bool = typer.Option(False, "--service-role", help="Use service role"),
+    skip_clean: bool = typer.Option(False, "--skip-clean", help="Skip cleaning system fields"),
 ) -> None:
     """Import entity records from a file."""
     try:
@@ -309,10 +318,15 @@ def import_records(
             print_error("File must contain an array of records")
             return
 
+        # Clean system fields unless skip-clean is specified
+        if not skip_clean:
+            records = [_clean_record_for_import(record) for record in records]
+            console.print(f"[dim]Cleaned system fields from {len(records)} records[/dim]")
+
         # Bulk create
+        console.print(f"[blue]Importing {len(records)} records...[/blue]")
         result = client.entity_bulk_create(entity_name, records, use_service_role=service_role)
-        print_success(f"Imported {len(records)} records from {file}")
-        print_output(result, "json")
+        print_success(f"Imported {len(result)} records from {file}")
     except Exception as e:
         print_error(str(e))
 

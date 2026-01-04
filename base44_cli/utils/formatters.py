@@ -99,7 +99,7 @@ def print_output(data: Any, format_type: str = "json", pretty: bool = True) -> N
 
 def print_error(message: str, exit_code: int = 1) -> None:
     """Print error message and exit."""
-    console.print(f"[red]Error:[/red] {message}", file=sys.stderr)
+    console.print(f"[red]Error:[/red] {message}")
     sys.exit(exit_code)
 
 

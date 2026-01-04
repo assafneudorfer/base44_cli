@@ -200,13 +200,13 @@ class Base44Client:
 
     def entity_bulk_create(
         self, entity_name: str, records: list[dict[str, Any]], use_service_role: bool = False
-    ) -> dict[str, Any]:
+    ) -> list[dict[str, Any]]:
         """Bulk create entity records."""
         headers = self._get_service_headers() if use_service_role else None
 
         response = self.client.post(
-            f"/api/apps/{self.app_id}/entities/{entity_name}/bulk-create",
-            json={"records": records},
+            f"/api/apps/{self.app_id}/entities/{entity_name}/bulk",
+            json=records,  # Send list directly, not wrapped in {"records": ...}
             headers=headers,
         )
         response.raise_for_status()
